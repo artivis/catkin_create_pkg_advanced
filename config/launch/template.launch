@@ -20,6 +20,6 @@
     </group>
 
     <!-- Minimal version -->
-    <!-- <node pkg="package_name" type="package_name_node.py" name="package_name"/> -->
+    <!-- <node pkg="package_name" type="package_name_node.py" name="package_name_node"/> -->
 
 </launch>

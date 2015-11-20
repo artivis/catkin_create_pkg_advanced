@@ -21,7 +21,7 @@ import argparse
 import os
 import sys
 from rospkg import RosPack, ResourceNotFound
-from shutil import move
+from shutil import move, rmtree
 from distutils.dir_util import copy_tree
 
 from catkin_pkg.package_templates import create_package_files, PackageTemplate
@@ -126,34 +126,72 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
     # Edit cfg folder and example file
     target_path_cfg = target_path + '/cfg/'
     # By tradition cfg files start with a capital letter
-    filename = package_name
-    filename[0] = filename[0].upper()
+    filename = package_name[0].upper() + package_name[1:]
     move(target_path_cfg + 'template.cfg',
          target_path_cfg + filename + '.cfg')
     replace_text(target_path_cfg + filename + '.cfg',
                  'package_name', package_name)
     # Edit src/<pkg_name> folder and init and example
-    target_path_src = target_path + 'src/'
+    target_path_src = target_path + '/src/'
     target_path_src_nodename = target_path_src + package_name + '/'
     os.makedirs(target_path_src_nodename)
     # Create __init__.py empty file
     open(target_path_src_nodename + '__init__.py', 'w')
-    # TODO: Copy example implementation file
+    target_path_python_examples =  target_path + '/example_python/'
+    move(target_path_python_examples + 'template_impl.py',
+         target_path_src_nodename + package_name + '_impl.py')
+    replace_text(target_path_src_nodename + package_name + '_impl.py',
+                 'package_name', package_name)
 
     # Edit scripts folder and example file
+    target_path_scripts = target_path + '/scripts/'
+    os.makedirs(target_path_scripts)
+    move(target_path_python_examples + 'template_node.py',
+         target_path_scripts + package_name +  '_node.py')
+    replace_text(target_path_scripts + package_name +  '_node.py',
+                 'package_name', package_name)
+
+    # Delete examples folder now that we are done with it
+    rmtree(target_path_python_examples)
 
     # Edit setup.py also adding requires
+    replace_text(target_path + '/setup.py',
+                 'package_name', package_name)
+    dependencies_list_as_string = str(args.dependencies)
+    replace_text(target_path + '/setup.py',
+                 'requires_place_holder', dependencies_list_as_string)
 
     # Edit rviz folder and empty example
 
     # Add C++ example files
+    target_path_cpp_examples =  target_path + '/example_cpp/'
+    target_path_src = target_path + '/src/'
+    move(target_path_cpp_examples + 'template.cpp',
+         target_path_src + package_name + '_node.cpp')
+    replace_text(target_path_src + package_name + '_node.cpp',
+                 'package_name', package_name)
+
+    rmtree(target_path_cpp_examples)
 
     # Modify CMakeLists.txt to:
+    target_path_cmakelists = target_path + '/CMakeLists.txt'
     #  - Add dynamic reconfigure
     #  - Add python executable
     #  - Add python installation
+    replace_text(target_path_cmakelists,
+                 '# catkin_python_setup()', 'catkin_python_setup()')
     #  - Add installation of launch and config and rviz
     #  - Add c++ example compilation lines
+    replace_text(target_path_cmakelists,
+                 '# add_executable(' + package_name + '_node src/' + package_name + '_node.cpp)',
+                 'add_executable(' + package_name + '_node src/' + package_name + '_node.cpp)')
+    replace_text(target_path_cmakelists,
+                 '''# target_link_libraries(''' + package_name + '''_node
+#   ${catkin_LIBRARIES}
+# )''',
+                 '''target_link_libraries(''' + package_name + '''_node
+   ${catkin_LIBRARIES}
+)''')
 
 
 if __name__ == '__main__':
