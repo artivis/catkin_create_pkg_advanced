@@ -1,0 +1,160 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Created on 11/20/15
+
+@author: sampfeiffer
+
+catkin_create_pkg_advanced is an improvement to
+catkin_create_pkg that adds some stuff I usually need:
+- Python stuff
+- launch stuff
+- config stuff
+- dynamic reconfigure stuff
+
+It starts as a pure copy of the catkin_create_pkg
+and then adds stuff
+"""
+
+from __future__ import print_function
+import argparse
+import os
+import sys
+from rospkg import RosPack, ResourceNotFound
+from shutil import move
+from distutils.dir_util import copy_tree
+
+from catkin_pkg.package_templates import create_package_files, PackageTemplate
+
+def replace_text(file_with_path, old_text, new_text):
+    print(file_with_path + ' will have replaced \'' + old_text + '\'' +
+          ' with \'' + new_text + '\'')
+    with open(file_with_path, 'r') as f:
+        contents = f.read()
+        replaced_contents = contents.replace(old_text, new_text)
+    with open(file_with_path, 'w') as f:
+        f.write(replaced_contents)
+
+
+def main(argv=sys.argv[1:], parent_path=os.getcwd()):
+    parser = argparse.ArgumentParser(
+        description='Creates a new catkin package')
+    parser.add_argument('name',
+                        nargs=1,
+                        help='The name for the package')
+    parser.add_argument('--meta',
+                        action='store_true',
+                        help='Creates meta-package files')
+    parser.add_argument('dependencies',
+                        nargs='*',
+                        help='Catkin package Dependencies')
+    parser.add_argument('-s', '--sys-deps',
+                        nargs='*',
+                        help='System Dependencies')
+    parser.add_argument('-b', '--boost-comps',
+                        nargs='*',
+                        help='Boost Components')
+    parser.add_argument('-V', '--pkg_version',
+                        action='store',
+                        help='Initial Package version')
+    parser.add_argument('-D', '--description',
+                        action='store',
+                        help='Description')
+    parser.add_argument('-l', '--license',
+                        action='append',
+                        help='Name for License, (e.g. BSD, MIT, GPLv3...)')
+    parser.add_argument('-a', '--author',
+                        action='append',
+                        help='A single author, may be used multiple times')
+    parser.add_argument('-m', '--maintainer',
+                        action='append',
+                        help='A single maintainer, may be used multiple times')
+    rosdistro_name = os.environ['ROS_DISTRO'] if 'ROS_DISTRO' in os.environ else None
+    parser.add_argument('--rosdistro', required=rosdistro_name is None, default=rosdistro_name, help='The ROS distro (default: environment variable ROS_DISTRO if defined)')
+
+    args = parser.parse_args(argv)
+
+    try:
+        package_name = args.name[0]
+        target_path = os.path.join(parent_path, package_name)
+        package_template = PackageTemplate._create_package_template(
+            package_name=package_name,
+            description=args.description,
+            licenses=args.license or [],
+            maintainer_names=args.maintainer,
+            author_names=args.author,
+            version=args.pkg_version,
+            catkin_deps=args.dependencies,
+            system_deps=args.sys_deps,
+            boost_comps=args.boost_comps)
+        create_package_files(target_path=target_path,
+                             package_template=package_template,
+                             rosdistro=args.rosdistro,
+                             newfiles={})
+        print('Successfully created files in %s. Please adjust the values in package.xml.' % target_path)
+    except ValueError as vae:
+        parser.error(str(vae))
+
+    # TODO: Make some parts optional (dynamic reconfigure?)
+
+    # Now we do our extras
+    rp = RosPack()
+    try:
+        template_path = rp.get_path('catkin_create_pkg_advanced') + '/config'
+    except ResourceNotFound:
+        print('Could not find catkin_create_pkg_advanced path! Not adding our sweets!')
+        return
+    print('Taking templates from: ' + template_path)
+    print('To be copied to: ' + target_path)
+    # Copy all templates
+    copy_tree(template_path, target_path)
+
+    # Edit launch folder and example file
+    target_path_launch = target_path + '/launch/'
+    move(target_path_launch + 'template.launch',
+         target_path_launch + package_name + '.launch')
+    replace_text(target_path_launch + package_name + '.launch',
+                 'package_name', package_name)
+
+    # Edit config folder and example file
+    target_path_config = target_path + '/config/'
+    move(target_path_config + 'template_config.yaml',
+         target_path_config + package_name + '_config.yaml')
+    replace_text(target_path_config + package_name + '_config.yaml',
+                 'package_name', package_name)
+
+    # Edit cfg folder and example file
+    target_path_cfg = target_path + '/cfg/'
+    # By tradition cfg files start with a capital letter
+    filename = package_name
+    filename[0] = filename[0].upper()
+    move(target_path_cfg + 'template.cfg',
+         target_path_cfg + filename + '.cfg')
+    replace_text(target_path_cfg + filename + '.cfg',
+                 'package_name', package_name)
+    # Edit src/<pkg_name> folder and init and example
+    target_path_src = target_path + 'src/'
+    target_path_src_nodename = target_path_src + package_name + '/'
+    os.makedirs(target_path_src_nodename)
+    # Create __init__.py empty file
+    open(target_path_src_nodename + '__init__.py', 'w')
+    # TODO: Copy example implementation file
+
+    # Edit scripts folder and example file
+
+    # Edit setup.py also adding requires
+
+    # Edit rviz folder and empty example
+
+    # Add C++ example files
+
+    # Modify CMakeLists.txt to:
+    #  - Add dynamic reconfigure
+    #  - Add python executable
+    #  - Add python installation
+    #  - Add installation of launch and config and rviz
+    #  - Add c++ example compilation lines
+
+
+if __name__ == '__main__':
+    main()

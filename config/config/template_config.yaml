@@ -1,0 +1,4 @@
+# General parameters
+package_name_param: 1
+
+# Dynamic reconfigure parameters

@@ -1,0 +1,25 @@
+<launch>
+    <!-- include other launch files first -->
+    <!-- <include file="$(find package_name)/launch/another_launch.launch" /> -->
+
+    <!-- input parameters -->
+    <arg name="ns" default="package_name_ns" />
+    <arg name="launch_parameter" default="some_value" />
+
+    <!-- launch everything under a namespace -->
+    <group ns="$(arg ns)">
+        <!-- launch node -->
+        <node pkg="package_name" type="package_name_node.py" name="package_name_node"  output="screen" args="">
+            <!-- load params first -->
+            <rosparam command="load" file="$(find package_name)/config/package_name_config.yaml" />
+            <!-- overwrite params from launch -->
+            <param name="package_name_param" value="$(arg launch_parameter)" />
+            <!-- remap topics -->
+            <remap from="topic"  to="/another_topic" />
+        </node>
+    </group>
+
+    <!-- Minimal version -->
+    <!-- <node pkg="package_name" type="package_name_node.py" name="package_name"/> -->
+
+</launch>
