@@ -3,21 +3,21 @@
 
 #include <geometry_msgs/Point.h>
 #include <tf/transform_listener.h>
-#include <sensor_msgs/LaserScan.h>
+#include <std_msgs/Empty.h>
 
 // Dynamic Reconfigure header
 #include <dynamic_reconfigure/server.h>
-#include <example_cpp/ExampleCppNodeReconfigureConfig.h>
+#include <package_name/package_nameConfig.h>
 
 // Local header
-#include "example_cpp/example_cpp.h"
+#include "package_name/package_name.h"
 
 // Empty namespace avoid
 // exporting those local typedef
 namespace
 {
-  typedef example_cpp::ExampleCppNodeReconfigureConfig Conf;
-  typedef dynamic_reconfigure::Server<Conf>            ReconfServer;
+  typedef package_name::package_nameConfig  Conf;
+  typedef dynamic_reconfigure::Server<Conf> ReconfServer;
 
   // A Custom Color Ros Log Stream
   #define ROS_GREEN_STREAM(x) ROS_INFO_STREAM("\033[1;32m" << x << "\033[0m")
@@ -43,8 +43,9 @@ namespace
     catch (tf::TransformException ex)
     {
       ROS_WARN_STREAM("Could not get initial transform from " << source
-                      << " to " << target << ".\n" << ex.what());
-      ROS_WARN_STREAM("Transform set to Identity.");
+                      << " to " << target << ".");
+      ROS_WARN_STREAM(ex.what());
+      ROS_WARN("Transform set to Identity.");
     }
 
     transform = source_to_target;
@@ -53,28 +54,29 @@ namespace
   }
 }
 
-class SomeClassRosNode
+class package_nameNode
 {
  public:
 
-  SomeClassRosNode() :
+  package_nameNode() :
     new_(false),
-    mydouble_(0.),
     source_frame_("odom"),
     target_frame_("base_link"),
     nh_("~"),
-    the_actual_stuff_()
+    package_name_()
   {
+    initParam_();
+
     dynreconf_srv_.reset(new ReconfServer(ros::NodeHandle("test_node_dynreconf")));
 
     ReconfServer::CallbackType cb;
-    cb = boost::bind(&SomeClassRosNode::dynReconCb_, this, _1, _2);
+    cb = boost::bind(&package_nameNode::dynReconCb_, this, _1, _2);
 
     dynreconf_srv_->setCallback(cb);
 
-    sub_ = nh_.subscribe("TestNode", 1, &SomeClassRosNode::callBack, this);
+    sub_ = nh_.subscribe("topic", 1, &package_nameNode::callBack, this);
 
-    pub_ = nh_.advertise<geometry_msgs::Point>("point", 1);
+    pub_ = nh_.advertise<std_msgs::Empty>("point", 1);
 
     if (getTf(source_frame_, target_frame_, source_to_target_))
     {
@@ -82,53 +84,45 @@ class SomeClassRosNode
                        << " to " << target_frame_);
     }
 
-    double squaredDist = source_to_target_.getOrigin().getX()*source_to_target_.getOrigin().getX() +
-                         source_to_target_.getOrigin().getY()*source_to_target_.getOrigin().getY();
-
-    the_actual_stuff_.setOffset( std::sqrt(squaredDist) );
+    package_name_.setStuff(/**/);
 
     ROS_GREEN_STREAM("Ready to work!");
   }
 
-  ~SomeClassRosNode() { }
+  ~package_nameNode() { }
 
-  void callBack(sensor_msgs::LaserScanPtr msg)
+  void callBack(std_msgs::EmptyPtr msg)
   {
     if (msg == NULL) return;
 
-    scan_ = *msg;
+    // Listen to Emptyness
+    empty_ = *msg;
 
     new_ = true;
   }
 
   bool process()
   {
-    foo::Point2d point2d;
-
-    // No new message, won't redoSomething
-    // but publish old results
+    // No new message, don't redoSomething
     if (new_)
     {
       ros::Time begin = ros::Time::now();
 
-      point2d = the_actual_stuff_.doSomething(scan_.ranges);
-
-      new_ = false;
+      new_ = !package_name_.doSomething(/*empty_*/);
 
       ROS_DEBUG_STREAM_THROTTLE(1, "Took : " << (ros::Time::now() - begin).toSec()
                                 << " sec to process.");
+
+      ROS_GREEN_STREAM("I do something.");
     }
 
     // What's the point if nobody's listening
     if (pub_.getNumSubscribers() < 1) return true;
 
-    geometry_msgs::Point pointMsg;
+    std_msgs::Empty empty;
 
-    pointMsg.x = point2d.x;
-    pointMsg.y = point2d.y;
-    pointMsg.z = 0;
-
-    pub_.publish(pointMsg);
+    // Publish
+    pub_.publish(empty);
 
     return true;
   }
@@ -136,8 +130,6 @@ class SomeClassRosNode
 private:
 
   bool new_;
-
-  double mydouble_;
 
   std::string source_frame_, target_frame_;
 
@@ -151,43 +143,43 @@ private:
 
   boost::shared_ptr<ReconfServer> dynreconf_srv_;
 
-  sensor_msgs::LaserScan scan_;
+  std_msgs::Empty empty_;
 
-  foo::SomeClass the_actual_stuff_;
+  foo::package_name package_name_;
 
   void initParam_()
   {
     nh_.param("source_frame", source_frame_, source_frame_);
     nh_.param("target_frame", target_frame_, target_frame_);
 
-    ROS_INFO("Parameters initialized.");
+    ROS_DEBUG("Parameters initialized.");
   }
 
   void dynReconCb_(Conf &config, uint32_t level)
   {
-    int myint = config.int_param;
+    int myInt = config.int_param;
 
-    mydouble_ = config.double_param;
+    double myDouble = config.double_param;
 
-    std::string mystr = config.str_param;
+    std::string myStr = config.str_param;
 
-    bool mybool = config.bool_param;
+    bool myBool = config.bool_param;
 
     // TODO : get enum
 
-    ROS_INFO("Dynamic Reconfigure:\n\tint_param = %i"   , myint);
-    ROS_INFO("Dynamic Reconfigure:\n\tdouble_param = %e", mydouble_);
-    ROS_INFO("Dynamic Reconfigure:\n\tstr_param = %s"   , mystr.c_str());
-    ROS_INFO("Dynamic Reconfigure:\n\tbool_param = %d"  , mybool);
+    ROS_INFO("Dynamic Reconfigure:\tint_param\t= %i"   , myInt);
+    ROS_INFO("Dynamic Reconfigure:\tdouble_param\t= %e", myDouble);
+    ROS_INFO("Dynamic Reconfigure:\tstr_param\t= %s"   , myStr.c_str());
+    ROS_INFO("Dynamic Reconfigure:\tbool_param\t= %d"  , myBool);
   }
 
 }; // class SomeClassRosNode
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "template_ros_node");
+  ros::init(argc, argv, "package_name_node");
 
-  SomeClassRosNode test_node;
+  package_nameNode test_node;
 
   ros::Rate rate(15);
 
@@ -195,9 +187,9 @@ int main(int argc, char **argv)
   {
     test_node.process();
 
-    ros::spinOnce();
-
     rate.sleep();
+
+    ros::spinOnce();
   }
 
   return 0;
