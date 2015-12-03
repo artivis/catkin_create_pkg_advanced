@@ -198,6 +198,9 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
 
     # Modify CMakeLists.txt to:
     target_path_cmakelists = target_path + '/CMakeLists.txt'
+
+    # TODO : update 'find_package(catkin REQUIRED COMPONENTS'
+
     #  - Add dynamic reconfigure
     #  - Add python executable
     #  - Add python installation
