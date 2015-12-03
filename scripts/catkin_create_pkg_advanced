@@ -126,11 +126,15 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
     # Edit cfg folder and example file
     target_path_cfg = target_path + '/cfg/'
     # By tradition cfg files start with a capital letter
-    filename = package_name[0].upper() + package_name[1:]
+    cfg_filename = package_name[0].upper() + package_name[1:]
     move(target_path_cfg + 'template.cfg',
-         target_path_cfg + filename + '.cfg')
-    replace_text(target_path_cfg + filename + '.cfg',
+         target_path_cfg + cfg_filename + '.cfg')
+    replace_text(target_path_cfg + cfg_filename + '.cfg',
                  'package_name', package_name)
+
+    # Check catkin_deps to rospy
+    #if "rospy" in args.dependencies:
+
     # Edit src/<pkg_name> folder and init and example
     target_path_src = target_path + '/src/'
     target_path_src_nodename = target_path_src + package_name + '/'
