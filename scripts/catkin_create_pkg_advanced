@@ -202,6 +202,14 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
     # TODO : update 'find_package(catkin REQUIRED COMPONENTS'
 
     #  - Add dynamic reconfigure
+    replace_text(target_path_cmakelists,
+                 '''# generate_dynamic_reconfigure_options(
+#   cfg/DynReconf1.cfg
+#   cfg/DynReconf2.cfg
+# )''',
+'''generate_dynamic_reconfigure_options(
+  cfg/''' + cfg_filename + '''.cfg
+)''')
     #  - Add python executable
     #  - Add python installation
     replace_text(target_path_cmakelists,
