@@ -167,15 +167,34 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
 
     # Edit rviz folder and empty example
 
-    # Add C++ example files
-    target_path_cpp_examples =  target_path + '/example_cpp/'
-    target_path_src = target_path + '/src/'
-    move(target_path_cpp_examples + 'template.cpp',
-         target_path_src + package_name + '_node.cpp')
-    replace_text(target_path_src + package_name + '_node.cpp',
-                 'package_name', package_name)
+    # Check catkin_deps to rospy
+    if "roscpp" in args.dependencies:
+        # Add C++ example files
+        target_path_cpp_examples =  target_path + '/example_cpp/'
+        target_path_src = target_path + '/src/'
+        target_path_inc = target_path + '/include/' + package_name + '/'
+        move(target_path_cpp_examples + '/src/template_node.cpp',
+             target_path_src + package_name + '_node.cpp')
+        replace_text(target_path_src + package_name + '_node.cpp',
+                     'package_name', package_name)
+        move(target_path_cpp_examples + '/src/template.cpp',
+             target_path_src + package_name + '.cpp')
+        replace_text(target_path_src + package_name + '.cpp',
+                     'package_name', package_name)
+        move(target_path_cpp_examples + '/include/template.h',
+            target_path_inc + package_name + '.h')
+        replace_text(target_path_inc + package_name + '.h',
+                     'package_name', package_name)
 
-    rmtree(target_path_cpp_examples)
+        replace_text(target_path_src + package_name + '_node.cpp',
+			'#include <'+package_name+'/'+package_name+'Config.h>',
+			'#include <'+package_name+'/'+cfg_filename+'Config.h>')
+
+        replace_text(target_path_src + package_name + '_node.cpp',
+			'typedef '+package_name+'::'+package_name+'Config',
+			'typedef '+package_name+'::'+cfg_filename+'Config')
+
+        rmtree(target_path_cpp_examples)
 
     # Modify CMakeLists.txt to:
     target_path_cmakelists = target_path + '/CMakeLists.txt'
