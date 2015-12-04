@@ -3,7 +3,7 @@
     <!-- <include file="$(find package_name)/launch/another_launch.launch" /> -->
 
     <!-- input parameters -->
-    <arg name="ns" default="" />
+    <arg name="ns" default="/" />
     <arg name="launch_parameter" default="some_value" />
 
     <!-- launch everything under a namespace -->
