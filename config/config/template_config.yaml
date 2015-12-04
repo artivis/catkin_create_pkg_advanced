@@ -1,6 +1,10 @@
 # General parameters
 package_name_param: 1
 
+# Private parameter
+package_name:
+  package_name_bool: false
+
 # Dynamic reconfigure parameters
 int_param: 50
 double_param: 0.5
