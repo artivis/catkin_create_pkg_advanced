@@ -26,6 +26,6 @@
     <!-- <node pkg="package_name" type="package_name_node" name="package_name_node" launch-prefix="valgrind"/> -->
     
     <!-- Minimal gdb version -->
-    <!-- <node pkg="package_name" type="package_name_node" name="package_name_node" launch-prefix="gdb -ex run --args"/> -->
+    <!-- <node pkg="package_name" type="package_name_node" name="package_name_node" launch-prefix="gdb -ex run - -args"/> -->
 
 </launch>
