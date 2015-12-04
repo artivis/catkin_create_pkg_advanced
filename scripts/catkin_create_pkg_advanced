@@ -129,6 +129,7 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
     replace_text(target_path_launch + package_name + '.launch',
                  'package_name', package_name)
 
+    # Edit cpp node launch file
     if use_roscpp:
         move(target_path_launch + 'template_roscpp.launch',
          target_path_launch + package_name + '_roscpp.launch')
@@ -187,11 +188,20 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
     # Edit rviz folder and empty example
 
     # Check catkin_deps to rospy
+
+    # Add C++ example files
     if use_roscpp:
-        # Add C++ example files
+
+        # Where to find cpp template
         target_path_cpp_examples =  target_path + '/example_cpp/'
+
+        # Where src will be copied
         target_path_src = target_path + '/src/'
+
+        # Where include will be copied
         target_path_inc = target_path + '/include/' + package_name + '/'
+
+        # Copy & edit cpp example
         move(target_path_cpp_examples + '/src/template_node.cpp',
              target_path_src + package_name + '_node.cpp')
         replace_text(target_path_src + package_name + '_node.cpp',
@@ -205,6 +215,7 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
         replace_text(target_path_inc + package_name + '.h',
                      'package_name', package_name)
 
+        # Special care to include dyn reconf header that starts with capital
         replace_text(target_path_src + package_name + '_node.cpp',
 			'#include <'+package_name+'/'+package_name+'Config.h>',
 			'#include <'+package_name+'/'+cfg_filename+'Config.h>')
@@ -218,7 +229,7 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
     # Modify CMakeLists.txt to:
     target_path_cmakelists = target_path + '/CMakeLists.txt'
 
-    #  - Add dynamic reconfigure
+    # Add dynamic reconfigure
     replace_text(target_path_cmakelists,
                  '''# generate_dynamic_reconfigure_options(
 #   cfg/DynReconf1.cfg
@@ -227,20 +238,24 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
 '''generate_dynamic_reconfigure_options(
   cfg/''' + cfg_filename + '''.cfg
 )''')
+
     #  - Add python executable
     #  - Add python installation
     replace_text(target_path_cmakelists,
                  '# catkin_python_setup()', 'catkin_python_setup()')
     #  - Add installation of launch and config and rviz
-    #  - Add c++ example compilation lines
+
+    #  - Add c++ example compilation
     if use_roscpp:
+
+		# Uncomment include dir & add include
         replace_text(target_path_cmakelists,
                  '''include_directories(
   ${catkin_INCLUDE_DIRS}
 )''', '''include_directories(
   ${catkin_INCLUDE_DIRS} include
 )''')
-
+        # Uncomment add_library & add package_name lib with package_name.cpp
         replace_text(target_path_cmakelists,
                  '''# add_library(''' + package_name + '''
 #   src/${PROJECT_NAME}/''' + package_name + '''.cpp
@@ -248,15 +263,17 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
                  '''add_library(''' + package_name + '''
   src/''' + package_name + '''.cpp
 )''')
-
+        # Uncomment add_executable & add exe package_name_node.cpp
         replace_text(target_path_cmakelists,
                  '# add_executable(' + package_name + '_node src/' + package_name + '_node.cpp)',
                  'add_executable(' + package_name + '_node src/' + package_name + '_node.cpp)')
 
+        # Uncomment add_dependencies for executable dyn reconf deps
         replace_text(target_path_cmakelists,
                  '# add_dependencies(my_test_pkg_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})',
                  'add_dependencies(my_test_pkg_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})')
 
+        # Uncomment target_link_libraries to link package_name lib with executable
         replace_text(target_path_cmakelists,
                  '''# target_link_libraries(''' + package_name + '''_node
 #   ${catkin_LIBRARIES}
