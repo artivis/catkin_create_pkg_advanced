@@ -129,6 +129,12 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
     replace_text(target_path_launch + package_name + '.launch',
                  'package_name', package_name)
 
+    if use_roscpp:
+        move(target_path_launch + 'template_roscpp.launch',
+         target_path_launch + package_name + '_roscpp.launch')
+        replace_text(target_path_launch + package_name + '_roscpp.launch',
+                 'package_name', package_name)
+
     # Edit config folder and example file
     target_path_config = target_path + '/config/'
     move(target_path_config + 'template_config.yaml',
