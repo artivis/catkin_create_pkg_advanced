@@ -124,8 +124,8 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
 
     # Edit launch folder and example file
     target_path_launch = target_path + '/launch/'
-    move(target_path_launch + 'template.launch',
-         target_path_launch + package_name + '.launch')
+    move(target_path_launch + 'template_rospy.launch',
+         target_path_launch + package_name + '_rospy.launch')
     replace_text(target_path_launch + package_name + '.launch',
                  'package_name', package_name)
 
