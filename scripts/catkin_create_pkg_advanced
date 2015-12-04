@@ -74,6 +74,19 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
 
     args = parser.parse_args(argv)
 
+    # Check if cpp/python example needed
+    use_roscpp = 'roscpp' in args.dependencies
+
+    use_rospy = 'rospy' in args.dependencies
+
+    # add potentially missing deps for the cpp template to compile
+    if use_roscpp:
+        if not 'tf' in args.dependencies:
+            args.dependencies.append('tf')
+        if not 'dynamic_reconfigure' in args.dependencies:
+            args.dependencies.append('dynamic_reconfigure')
+        if not 'std_msgs' in args.dependencies:
+            args.dependencies.append('std_msgs')
     try:
         package_name = args.name[0]
         target_path = os.path.join(parent_path, package_name)
@@ -168,7 +181,7 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
     # Edit rviz folder and empty example
 
     # Check catkin_deps to rospy
-    if "roscpp" in args.dependencies:
+    if use_roscpp:
         # Add C++ example files
         target_path_cpp_examples =  target_path + '/example_cpp/'
         target_path_src = target_path + '/src/'
@@ -198,8 +211,6 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
 
     # Modify CMakeLists.txt to:
     target_path_cmakelists = target_path + '/CMakeLists.txt'
-
-    # TODO : update 'find_package(catkin REQUIRED COMPONENTS'
 
     #  - Add dynamic reconfigure
     replace_text(target_path_cmakelists,
