@@ -30,12 +30,16 @@ After compilation (catkin_make)
 
     rosrun my_test_pkg my_test_pkg_node
 
+in another terminal
+
+    rostopic pub /my_test_pkg_node/topic_in std_msgs/Empty "{}"
+
 or
 
     roslaunch my_test_pkg my_test_pkg_roscpp.launch
 
 in another terminal
 
-    rostopic pub /my_test_pkg_node/topic_in std_msgs/Empty "{}"
+    rostopic pub /my_test_pkg_node/another_topic std_msgs/Empty "{}"
 
 Voila !
