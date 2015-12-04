@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>@name</name>
+  <version@version_abi>@version</version>
+  <description>@description</description>
+
+  <!-- One maintainer tag required, multiple allowed, one person per tag --> 
+  <!-- Example:  -->
+  <!-- <maintainer email="jane.doe@@example.com">Jane Doe</maintainer> -->
+@maintainers
+
+  <!-- One license tag required, multiple allowed, one license per tag -->
+  <!-- Commonly used license strings: -->
+  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
+@licenses
+
+  <!-- Url tags are optional, but mutiple are allowed, one per tag -->
+  <!-- Optional attribute type can be: website, bugtracker, or repository -->
+  <!-- Example: -->
+  <!-- <url type="website">http://wiki.ros.org/@name</url> -->
+@urls
+
+  <!-- Author tags are optional, mutiple are allowed, one per tag -->
+  <!-- Authors do not have to be maintianers, but could be -->
+  <!-- Example: -->
+  <!-- <author email="jane.doe@@example.com">Jane Doe</author> -->
+@authors
+
+  <!-- Packages can have six types of dependencies -->
+  <!-- Dependencies can be catkin packages or system dependencies -->
+
+  <!-- Build: -->
+
+    <!-- <depend> -->
+    <!-- Specifies that a dependency is a build, export, and execution dependency.
+         This is the most commonly used dependency tag -->
+    <!-- <depend>roscpp</depend> -->
+
+    <!-- <buildtool_depend> -->
+    <!-- Specify build system tools which this package needs to build itself.
+         Typically the only build tool needed is catkin.
+	     In a cross-compilation scenario build tool dependencies are for the 
+	     architecture on which the compilation is performed. -->
+    <!-- <buildtool_depend>catkin</buildtool_depend> -->
+
+    <!-- <build_depend> -->
+    <!-- Specify which packages are needed to build this package.
+	     This is the case when any file from these packages is required at build time.
+	     This can be including headers from these packages at compilation time,
+	     linking against libraries from these packages or requiring any other resource
+	     at build time (especially when these packages are find_package()-ed in CMake). 
+  	     In a cross-compilation scenario build dependencies are for the targeted architecture. -->
+    <!-- <build_depend>message_generation</build_depend> -->
+
+    <!-- <build_export_depend> -->
+    <!-- Specify which packages are needed to build libraries against this package.
+         This is the case when you transitively include their headers in public headers
+         in this package (especially when these packages are declared as
+         (CATKIN_)DEPENDS in catkin_package() in CMake) -->
+    <!-- <build_export_depend>??</build_export_depend> -->
+
+  <!-- Execution: -->
+  
+    <!-- <exec_depend> -->
+    <!-- Specify which packages are needed to run code in this package.
+         This is the case when you depend on shared libraries in this package
+         (especially when these packages are declared as
+         (CATKIN_)DEPENDS in catkin_package() in CMake) -->
+    <!-- <exec_depend>rospy</exec_depend> -->
+  
+  <!-- Test: -->
+
+    <!-- <test_depend> -->
+    <!-- Specify only additional dependencies for unit tests.
+         They should never duplicate any dependencies already
+         mentioned as build or run dependencies -->
+    <!-- <test_depend>python-mock</test_depend> -->
+    <!-- <test_depend>gtest</test_depend> -->
+  
+  <!-- Doc: -->
+  
+    <!-- <doc_depend> -->
+    <!-- Specify documentation tools which this package needs to generate documentation -->
+    <!-- <doc_depend>doxygen</doc_depend> -->
+  
+@dependencies
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+    <!-- <metapackage /> -->
+@exports
+  </export>
+</package>
