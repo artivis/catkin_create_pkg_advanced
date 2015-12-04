@@ -74,9 +74,9 @@ class package_nameNode
 
     dynreconf_srv_->setCallback(cb);
 
-    sub_ = nh_.subscribe("topic", 1, &package_nameNode::callBack, this);
+    sub_ = nh_.subscribe("topic_in", 1, &package_nameNode::callBack, this);
 
-    pub_ = nh_.advertise<std_msgs::Empty>("point", 1);
+    pub_ = nh_.advertise<std_msgs::Empty>("topic_out", 1);
 
     if (getTf(source_frame_, target_frame_, source_to_target_))
     {
