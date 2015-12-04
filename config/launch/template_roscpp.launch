@@ -15,7 +15,7 @@
             <!-- overwrite params from launch -->
             <param name="package_name_param" value="$(arg launch_parameter)" />
             <!-- remap topics -->
-            <remap from="topic"  to="/another_topic" />
+            <remap from="topic_in" to="/another_topic" />
         </node>
     </group>
 
