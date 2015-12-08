@@ -147,8 +147,18 @@ include_directories(
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
 
-install(DIRECTORY config
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+#install(DIRECTORY config
+#  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
+install(PROGRAMS
+  scripts/catkin_create_pkg_advanced
+  DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+)
+
+set(EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/scripts/catkin_create_pkg_advanced)
+configure_file(${catkin_EXTRAS_DIR}/templates/script.sh.in
+  ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_BIN_DESTINATION}/catkin_create_pkg_advanced
+  @ONLY)
 
 #############
 ## Testing ##
