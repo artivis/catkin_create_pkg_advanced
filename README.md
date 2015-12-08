@@ -22,24 +22,34 @@ Wrapper over catkin_create_pkg that also adds:
 
 To ease life on creating a new package.
 
-Cpp Example :
+Don't forget to source your `devel/setup.bash` after `catkin_make` !
 
-    rosrun catkin_create_pkg_advanced catkin_create_pkg_advanced [usual catkin_create_pkg args] my_test_pkg roscpp
+```shell
+catkin_create_pkg_advanced [usual catkin_create_pkg args] my_test_pkg roscpp
+```
 
-After compilation (catkin_make)
+After another `catkin_make` !
 
-    rosrun my_test_pkg my_test_pkg_node
+```shell
+rosrun my_test_pkg my_test_pkg_node
+```
 
 in another terminal
 
-    rostopic pub /my_test_pkg_node/topic_in std_msgs/Empty "{}"
+```shell
+rostopic pub /my_test_pkg_node/topic_in std_msgs/Empty "{}"
+```
 
 or
 
-    roslaunch my_test_pkg my_test_pkg_roscpp.launch
+```shell
+roslaunch my_test_pkg my_test_pkg_roscpp.launch
+```
 
 in another terminal
 
-    rostopic pub /my_test_pkg_node/another_topic std_msgs/Empty "{}"
+```shell
+rostopic pub /my_test_pkg_node/another_topic std_msgs/Empty "{}"
+```
 
 Voila !
