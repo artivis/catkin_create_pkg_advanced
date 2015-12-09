@@ -8,6 +8,10 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
 )
 
+catkin_add_env_hooks(20.catkin_create_pkg_advanced SHELLS bash
+	DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/env-hooks
+)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
