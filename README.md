@@ -21,3 +21,35 @@ Wrapper over catkin_create_pkg that also adds:
 *  - Add c++ example compilation lines
 
 To ease life on creating a new package.
+
+Don't forget to source your `devel/setup.bash` after `catkin_make` !
+
+```shell
+catkin_create_pkg_advanced [usual catkin_create_pkg args] my_test_pkg roscpp
+```
+
+After another `catkin_make` !
+
+```shell
+rosrun my_test_pkg my_test_pkg_node
+```
+
+in another terminal
+
+```shell
+rostopic pub /my_test_pkg_node/topic_in std_msgs/Empty "{}"
+```
+
+or
+
+```shell
+roslaunch my_test_pkg my_test_pkg_roscpp.launch
+```
+
+in another terminal
+
+```shell
+rostopic pub /my_test_pkg_node/another_topic std_msgs/Empty "{}"
+```
+
+Voila !
