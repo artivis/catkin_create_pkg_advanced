@@ -26,6 +26,7 @@ from distutils.dir_util import copy_tree
 
 from catkin_pkg.package_templates import create_package_files, PackageTemplate
 
+
 def replace_text(file_with_path, old_text, new_text):
     print(file_with_path + ' will have replaced \'' + old_text + '\'' +
           ' with \'' + new_text + '\'')
@@ -69,8 +70,11 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
     parser.add_argument('-m', '--maintainer',
                         action='append',
                         help='A single maintainer, may be used multiple times')
-    rosdistro_name = os.environ['ROS_DISTRO'] if 'ROS_DISTRO' in os.environ else None
-    parser.add_argument('--rosdistro', required=rosdistro_name is None, default=rosdistro_name, help='The ROS distro (default: environment variable ROS_DISTRO if defined)')
+    rosdistro_name = os.environ[
+        'ROS_DISTRO'] if 'ROS_DISTRO' in os.environ else None
+    parser.add_argument('--rosdistro', required=rosdistro_name is None,
+                        default=rosdistro_name,
+                        help='The ROS distro (default: environment variable ROS_DISTRO if defined)')
 
     args = parser.parse_args(argv)
 
@@ -81,11 +85,11 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
 
     # add potentially missing deps for the cpp template to compile
     if use_roscpp:
-        if not 'tf' in args.dependencies:
+        if 'tf' not in args.dependencies:
             args.dependencies.append('tf')
-        if not 'dynamic_reconfigure' in args.dependencies:
+        if 'dynamic_reconfigure' not in args.dependencies:
             args.dependencies.append('dynamic_reconfigure')
-        if not 'std_msgs' in args.dependencies:
+        if 'std_msgs' not in args.dependencies:
             args.dependencies.append('std_msgs')
     try:
         package_name = args.name[0]
@@ -104,7 +108,8 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
                              package_template=package_template,
                              rosdistro=args.rosdistro,
                              newfiles={})
-        print('Successfully created files in %s. Please adjust the values in package.xml.' % target_path)
+        print('Successfully created files in %s.' +
+              ' Please adjust the values in package.xml.' % target_path)
     except ValueError as vae:
         parser.error(str(vae))
 
@@ -115,7 +120,8 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
     try:
         template_path = rp.get_path('catkin_create_pkg_advanced') + '/config'
     except ResourceNotFound:
-        print('Could not find catkin_create_pkg_advanced path! Not adding our sweets!')
+        print('Could not find catkin_create_pkg_advanced path!' +
+              ' Not adding our sweets!')
         return
     print('Taking templates from: ' + template_path)
     print('To be copied to: ' + target_path)
@@ -132,9 +138,9 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
     # Edit cpp node launch file
     if use_roscpp:
         move(target_path_launch + 'template_roscpp.launch',
-         target_path_launch + package_name + '_roscpp.launch')
+             target_path_launch + package_name + '_roscpp.launch')
         replace_text(target_path_launch + package_name + '_roscpp.launch',
-                 'package_name', package_name)
+                     'package_name', package_name)
 
     # Edit config folder and example file
     target_path_config = target_path + '/config/'
@@ -153,7 +159,7 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
                  'package_name', package_name)
 
     # Check catkin_deps to rospy
-    #if "rospy" in args.dependencies:
+    # if "rospy" in args.dependencies:
 
     # Edit src/<pkg_name> folder and init and example
     target_path_src = target_path + '/src/'
@@ -161,7 +167,7 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
     os.makedirs(target_path_src_nodename)
     # Create __init__.py empty file
     open(target_path_src_nodename + '__init__.py', 'w')
-    target_path_python_examples =  target_path + '/example_python/'
+    target_path_python_examples = target_path + '/example_python/'
     move(target_path_python_examples + 'template_impl.py',
          target_path_src_nodename + package_name + '_impl.py')
     replace_text(target_path_src_nodename + package_name + '_impl.py',
@@ -171,8 +177,8 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
     target_path_scripts = target_path + '/scripts/'
     os.makedirs(target_path_scripts)
     move(target_path_python_examples + 'template_node.py',
-         target_path_scripts + package_name +  '_node.py')
-    replace_text(target_path_scripts + package_name +  '_node.py',
+         target_path_scripts + package_name + '_node.py')
+    replace_text(target_path_scripts + package_name + '_node.py',
                  'package_name', package_name)
 
     # Delete examples folder now that we are done with it
@@ -193,7 +199,7 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
     if use_roscpp:
 
         # Where to find cpp template
-        target_path_cpp_examples =  target_path + '/example_cpp/'
+        target_path_cpp_examples = target_path + '/example_cpp/'
 
         # Where src will be copied
         target_path_src = target_path + '/src/'
@@ -211,18 +217,20 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
         replace_text(target_path_src + package_name + '.cpp',
                      'package_name', package_name)
         move(target_path_cpp_examples + '/include/template.h',
-            target_path_inc + package_name + '.h')
+             target_path_inc + package_name + '.h')
         replace_text(target_path_inc + package_name + '.h',
                      'package_name', package_name)
 
         # Special care to include dyn reconf header that starts with capital
         replace_text(target_path_src + package_name + '_node.cpp',
-			'#include <'+package_name+'/'+package_name+'Config.h>',
-			'#include <'+package_name+'/'+cfg_filename+'Config.h>')
+                     '#include <' + package_name + '/' +
+                     package_name + 'Config.h>',
+                     '#include <' + package_name + '/' + cfg_filename + 'Config.h>')
 
         replace_text(target_path_src + package_name + '_node.cpp',
-			'typedef '+package_name+'::'+package_name+'Config',
-			'typedef '+package_name+'::'+cfg_filename+'Config')
+                     'typedef ' + package_name +
+                     '::' + package_name + 'Config',
+                     'typedef ' + package_name + '::' + cfg_filename + 'Config')
 
         rmtree(target_path_cpp_examples)
 
@@ -235,7 +243,7 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
 #   cfg/DynReconf1.cfg
 #   cfg/DynReconf2.cfg
 # )''',
-'''generate_dynamic_reconfigure_options(
+                 '''generate_dynamic_reconfigure_options(
   cfg/''' + cfg_filename + '''.cfg
 )''')
 
@@ -248,37 +256,39 @@ def main(argv=sys.argv[1:], parent_path=os.getcwd()):
     #  - Add c++ example compilation
     if use_roscpp:
 
-		# Uncomment include dir & add include
+                # Uncomment include dir & add include
         replace_text(target_path_cmakelists,
-                 '''include_directories(
+                     '''include_directories(
   ${catkin_INCLUDE_DIRS}
 )''', '''include_directories(
   ${catkin_INCLUDE_DIRS} include
 )''')
         # Uncomment add_library & add package_name lib with package_name.cpp
         replace_text(target_path_cmakelists,
-                 '''# add_library(''' + package_name + '''
+                     '''# add_library(''' + package_name + '''
 #   src/${PROJECT_NAME}/''' + package_name + '''.cpp
 # )''',
-                 '''add_library(''' + package_name + '''
+                     '''add_library(''' + package_name + '''
   src/''' + package_name + '''.cpp
 )''')
         # Uncomment add_executable & add exe package_name_node.cpp
         replace_text(target_path_cmakelists,
-                 '# add_executable(' + package_name + '_node src/' + package_name + '_node.cpp)',
-                 'add_executable(' + package_name + '_node src/' + package_name + '_node.cpp)')
+                     '# add_executable(' + package_name +
+                     '_node src/' + package_name + '_node.cpp)',
+                     'add_executable(' + package_name + '_node src/' + package_name + '_node.cpp)')
 
         # Uncomment add_dependencies for executable dyn reconf deps
         replace_text(target_path_cmakelists,
-                 '# add_dependencies(my_test_pkg_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})',
-                 'add_dependencies(my_test_pkg_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})')
+                     '# add_dependencies(my_test_pkg_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})',
+                     'add_dependencies(my_test_pkg_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})')
 
-        # Uncomment target_link_libraries to link package_name lib with executable
+        # Uncomment target_link_libraries to link package_name lib with
+        # executable
         replace_text(target_path_cmakelists,
-                 '''# target_link_libraries(''' + package_name + '''_node
+                     '''# target_link_libraries(''' + package_name + '''_node
 #   ${catkin_LIBRARIES}
 # )''',
-                 '''target_link_libraries(''' + package_name + '''_node
+                     '''target_link_libraries(''' + package_name + '''_node
    ${catkin_LIBRARIES} ''' + package_name + '''
 )''')
 
